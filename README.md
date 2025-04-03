@@ -1,5 +1,7 @@
 # Turborepo Tailwind CSS starter
 
+Boilerplate from here below -> TODO clear
+
 This Turborepo starter is maintained by the Turborepo core team.
 
 ## Using this example
