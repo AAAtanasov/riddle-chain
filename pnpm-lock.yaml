@@ -18,6 +18,24 @@ importers:
         specifier: ^2.5.0
         version: 2.5.0
 
+  apps/contracts:
+    devDependencies:
+      '@nomicfoundation/hardhat-toolbox':
+        specifier: ^5.0.0
+        version: 5.0.0(@nomicfoundation/hardhat-chai-matchers@2.0.8)(@nomicfoundation/hardhat-ethers@3.0.8)(@nomicfoundation/hardhat-ignition-ethers@0.15.10)(@nomicfoundation/hardhat-network-helpers@1.0.12)(@nomicfoundation/hardhat-verify@2.0.13)(@typechain/ethers-v6@0.5.1)(@typechain/hardhat@9.1.0)(@types/chai@4.3.20)(@types/mocha@10.0.10)(@types/node@22.13.9)(chai@4.5.0)(ethers@6.13.5)(hardhat-gas-reporter@1.0.10)(hardhat@2.22.19)(solidity-coverage@0.8.14)(ts-node@10.9.2)(typechain@8.3.2)(typescript@5.8.2)
+      '@typechain/ethers-v6':
+        specifier: ^0.5.1
+        version: 0.5.1(ethers@6.13.5)(typechain@8.3.2)(typescript@5.8.2)
+      '@typechain/hardhat':
+        specifier: ^9.1.0
+        version: 9.1.0(@typechain/ethers-v6@0.5.1)(ethers@6.13.5)(hardhat@2.22.19)(typechain@8.3.2)
+      hardhat:
+        specifier: ^2.22.19
+        version: 2.22.19(ts-node@10.9.2)(typescript@5.8.2)
+      typechain:
+        specifier: ^8.3.2
+        version: 8.3.2(typescript@5.8.2)
+
   apps/web:
     dependencies:
       '@repo/ui':
@@ -69,24 +87,6 @@ importers:
       typescript:
         specifier: 5.8.2
         version: 5.8.2
-
-  apps/web/contracts:
-    devDependencies:
-      '@nomicfoundation/hardhat-toolbox':
-        specifier: ^5.0.0
-        version: 5.0.0(@nomicfoundation/hardhat-chai-matchers@2.0.8)(@nomicfoundation/hardhat-ethers@3.0.8)(@nomicfoundation/hardhat-ignition-ethers@0.15.10)(@nomicfoundation/hardhat-network-helpers@1.0.12)(@nomicfoundation/hardhat-verify@2.0.13)(@typechain/ethers-v6@0.5.1)(@typechain/hardhat@9.1.0)(@types/chai@4.3.20)(@types/mocha@10.0.10)(@types/node@22.13.9)(chai@4.5.0)(ethers@6.13.5)(hardhat-gas-reporter@1.0.10)(hardhat@2.22.19)(solidity-coverage@0.8.14)(ts-node@10.9.2)(typechain@8.3.2)(typescript@5.8.2)
-      '@typechain/ethers-v6':
-        specifier: ^0.5.1
-        version: 0.5.1(ethers@6.13.5)(typechain@8.3.2)(typescript@5.8.2)
-      '@typechain/hardhat':
-        specifier: ^9.1.0
-        version: 9.1.0(@typechain/ethers-v6@0.5.1)(ethers@6.13.5)(hardhat@2.22.19)(typechain@8.3.2)
-      hardhat:
-        specifier: ^2.22.19
-        version: 2.22.19(ts-node@10.9.2)(typescript@5.8.2)
-      typechain:
-        specifier: ^8.3.2
-        version: 8.3.2(typescript@5.8.2)
 
   packages/eslint-config:
     devDependencies:
@@ -215,7 +215,7 @@ packages:
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     dependencies:
       '@eslint/object-schema': 2.1.6
-      debug: 4.4.0
+      debug: 4.4.0(supports-color@8.1.1)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -238,7 +238,7 @@ packages:
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     dependencies:
       ajv: 6.12.6
-      debug: 4.4.0
+      debug: 4.4.0(supports-color@8.1.1)
       espree: 10.3.0
       globals: 14.0.0
       ignore: 5.3.2
@@ -1658,7 +1658,7 @@ packages:
       '@typescript-eslint/types': 8.29.0
       '@typescript-eslint/typescript-estree': 8.29.0(typescript@5.8.2)
       '@typescript-eslint/visitor-keys': 8.29.0
-      debug: 4.4.0
+      debug: 4.4.0(supports-color@8.1.1)
       eslint: 9.23.0
       typescript: 5.8.2
     transitivePeerDependencies:
@@ -1682,7 +1682,7 @@ packages:
     dependencies:
       '@typescript-eslint/typescript-estree': 8.29.0(typescript@5.8.2)
       '@typescript-eslint/utils': 8.29.0(eslint@9.23.0)(typescript@5.8.2)
-      debug: 4.4.0
+      debug: 4.4.0(supports-color@8.1.1)
       eslint: 9.23.0
       ts-api-utils: 2.1.0(typescript@5.8.2)
       typescript: 5.8.2
@@ -1703,7 +1703,7 @@ packages:
     dependencies:
       '@typescript-eslint/types': 8.29.0
       '@typescript-eslint/visitor-keys': 8.29.0
-      debug: 4.4.0
+      debug: 4.4.0(supports-color@8.1.1)
       fast-glob: 3.3.3
       is-glob: 4.0.3
       minimatch: 9.0.5
@@ -2559,18 +2559,6 @@ packages:
     resolution: {integrity: sha512-vsV6S4KVHvTGxbEcij7hkWRv0It+sGGWVOM67dQde/o5Xjnr+KmLjxWJii2uEObIrt1CcM9w0Yaovx+iOlIL+w==}
     dev: true
 
-  /debug@4.4.0:
-    resolution: {integrity: sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==}
-    engines: {node: '>=6.0'}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
-    dependencies:
-      ms: 2.1.3
-    dev: true
-
   /debug@4.4.0(supports-color@8.1.1):
     resolution: {integrity: sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==}
     engines: {node: '>=6.0'}
@@ -2988,7 +2976,7 @@ packages:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.6
-      debug: 4.4.0
+      debug: 4.4.0(supports-color@8.1.1)
       escape-string-regexp: 4.0.0
       eslint-scope: 8.3.0
       eslint-visitor-keys: 4.2.0
