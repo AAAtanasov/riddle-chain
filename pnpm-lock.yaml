@@ -20,6 +20,12 @@ importers:
 
   apps/bot-llm:
     dependencies:
+      '@langchain/core':
+        specifier: ^0.3.43
+        version: 0.3.43
+      '@langchain/openai':
+        specifier: ^0.5.3
+        version: 0.5.3(@langchain/core@0.3.43)
       langchain:
         specifier: ^0.3.19
         version: 0.3.19(@langchain/core@0.3.43)
@@ -27,6 +33,21 @@ importers:
       '@types/node':
         specifier: ^22.13.9
         version: 22.13.9
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.29.0
+        version: 8.29.0(@typescript-eslint/parser@8.29.0)(eslint@9.23.0)(typescript@5.8.2)
+      '@typescript-eslint/parser':
+        specifier: ^8.29.0
+        version: 8.29.0(eslint@9.23.0)(typescript@5.8.2)
+      dotenv:
+        specifier: ^16.4.7
+        version: 16.4.7
+      eslint:
+        specifier: ^9.23.0
+        version: 9.23.0
+      typescript:
+        specifier: ^5.8.2
+        version: 5.8.2
 
   apps/contracts:
     devDependencies:
@@ -906,6 +927,22 @@ packages:
 
   /@langchain/openai@0.4.9(@langchain/core@0.3.43):
     resolution: {integrity: sha512-NAsaionRHNdqaMjVLPkFCyjUDze+OqRHghA1Cn4fPoAafz+FXcl9c7LlEl9Xo0FH6/8yiCl7Rw2t780C/SBVxQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@langchain/core': '>=0.3.39 <0.4.0'
+    dependencies:
+      '@langchain/core': 0.3.43
+      js-tiktoken: 1.0.19
+      openai: 4.91.1(zod@3.24.2)
+      zod: 3.24.2
+      zod-to-json-schema: 3.24.5(zod@3.24.2)
+    transitivePeerDependencies:
+      - encoding
+      - ws
+    dev: false
+
+  /@langchain/openai@0.5.3(@langchain/core@0.3.43):
+    resolution: {integrity: sha512-TlP9I748a1Dtl+ueLE8PUYRqvvj7JwZtgOptJ/Jli+ltau6Gf51FwfwGG7Ick9A41hrabTfZn8Nmq2OK6G8Bwg==}
     engines: {node: '>=18'}
     peerDependencies:
       '@langchain/core': '>=0.3.39 <0.4.0'
@@ -2774,6 +2811,11 @@ packages:
 
   /dotenv@16.0.3:
     resolution: {integrity: sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==}
+    engines: {node: '>=12'}
+    dev: true
+
+  /dotenv@16.4.7:
+    resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
     engines: {node: '>=12'}
     dev: true
 

@@ -4,15 +4,26 @@
   "description": "Bot responsible for tracking riddle events from blockchain and publishing new riddles.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "typecheck": "tsc --noEmit",
+    "start": "npx ts-node main.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@langchain/core": "^0.3.43",
+    "@langchain/openai": "^0.5.3",
     "langchain": "^0.3.19"
   },
   "devDependencies": {
-    "@types/node": "^22.13.9"
+    "@types/node": "^22.13.9",
+    "@typescript-eslint/eslint-plugin": "^8.29.0",
+    "@typescript-eslint/parser": "^8.29.0",
+    "dotenv": "^16.4.7",
+    "eslint": "^9.23.0",
+    "typescript": "^5.8.2"
   }
 }
