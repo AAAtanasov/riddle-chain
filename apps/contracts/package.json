@@ -4,16 +4,21 @@
   "description": "Smart contracts for RiddleChain",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy-riddle": "npx hardhat run scripts/deploy-riddle.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@nomicfoundation/hardhat-ignition": "^0.15.10",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@typechain/ethers-v6": "^0.5.1",
     "@typechain/hardhat": "^9.1.0",
     "hardhat": "^2.22.19",
     "typechain": "^8.3.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
   }
 }

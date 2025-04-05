@@ -1,6 +1,7 @@
-
+import RiddleComponent from "../components/Test";
 
 export default function Page() {
+
   return (
     <main className="flex items-center justify-center min-h-screen p-24">
       <div className="flex flex-col bg-white rounded-lg shadow-xl p-16">
@@ -22,7 +23,13 @@ export default function Page() {
           <span>Previous winners:</span>
           <span>Test, Arpbb aaand Mooore!</span>
         </div>
+
         <button className="mt-4 bg-lime-400 p-4 rounded-xl ">Submit riddle</button>
+
+        <div className="flex">
+          <RiddleComponent />
+
+        </div>
       </div>
     </main>
   );
