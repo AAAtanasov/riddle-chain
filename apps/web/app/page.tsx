@@ -1,4 +1,4 @@
-import RiddleComponent from "../components/Test";
+import Riddle from "../components/Riddle";
 
 export default function Page() {
 
@@ -27,7 +27,7 @@ export default function Page() {
         <button className="mt-4 bg-lime-400 p-4 rounded-xl ">Submit riddle</button>
 
         <div className="flex">
-          <RiddleComponent />
+          <Riddle />
 
         </div>
       </div>
