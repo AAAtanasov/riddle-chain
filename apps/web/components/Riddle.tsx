@@ -1,9 +1,10 @@
 'use client';
 
-import { BrowserProvider, Contract, ethers } from "ethers";
+import { BrowserProvider } from "ethers";
 import { useEffect, useState } from "react";
 
-import OnchainRiddle from "../lib/smart-contracts-abi/OnchainRiddle.json"
+import { OnchainRiddle__factory as riddleFactory } from "../lib/typechain-types/factories"
+
 
 // Potential fix for type of ethereum
 declare global {
@@ -25,7 +26,7 @@ export default function Riddle() {
         if (typeof window.ethereum !== 'undefined') {
             const browserProvider = new BrowserProvider(window.ethereum);
             // TODO: define contract type from typechain
-            const contract = new Contract(RIDDLE_CONTRACT_ADDRESS, OnchainRiddle.abi, browserProvider);
+            const contract = riddleFactory.connect(RIDDLE_CONTRACT_ADDRESS, browserProvider);
 
             try {
                 const data = await contract.riddle();

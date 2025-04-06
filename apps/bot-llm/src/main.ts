@@ -3,6 +3,7 @@ import { OpenAiService } from "./openai-llm/openai.service";
 import path from "path";
 import { config } from "dotenv";
 
+// TODO: load based on environment
 config({ path: path.resolve(__dirname, '../.env.local') });
 
 
