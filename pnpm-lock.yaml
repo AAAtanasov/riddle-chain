@@ -54,6 +54,9 @@ importers:
       dotenv:
         specifier: ^16.4.7
         version: 16.4.7
+      ethers:
+        specifier: ^6.13.5
+        version: 6.13.5
     devDependencies:
       '@nomicfoundation/hardhat-ignition':
         specifier: ^0.15.10
