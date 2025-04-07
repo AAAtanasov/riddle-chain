@@ -32,4 +32,4 @@ COPY --from=builder /app/apps/bot-llm/node_modules ./node_modules
 ENV NODE_ENV production
 
 # Run the application
-CMD ["dist", "node", "main.js"]
+CMD node apps/bot-llm/dist/main.js
