@@ -1,6 +1,6 @@
 import { ChatOpenAI } from "@langchain/openai";
 import { LLMService } from "../llm-service.interface";
-import { RiddleModel } from "../riddle.model";
+import { RiddleModel } from "../riddle/riddle.model";
 
 
 export class OpenAiService implements LLMService {
@@ -10,7 +10,7 @@ export class OpenAiService implements LLMService {
         this.model = new ChatOpenAI({ model: "gpt-4o-mini", temperature: 0.1, openAIApiKey: apiKey });
     }
 
-    public async getRiddle(): Promise<RiddleModel> {
+    public async generateRiddle(): Promise<RiddleModel> {
         const prompt = this.getPromptMessage();
 
         const response = await this.model.invoke(prompt);

@@ -1,5 +1,5 @@
-import { RiddleModel } from "./riddle.model";
+import { RiddleModel } from "./riddle/riddle.model";
 
 export interface LLMService {
-    getRiddle(): Promise<RiddleModel>;
+    generateRiddle(): Promise<RiddleModel>;
 };
