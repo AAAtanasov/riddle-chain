@@ -101,14 +101,12 @@ export default function Riddle() {
         setIsActive(false);
         requestAccount();
 
-
         const browserProvider = fetchBrowserProvider();
         const signer = await browserProvider.getSigner();
         console.log("Signer: ", signer);
 
         const contract: OnchainRiddle = riddleFactory.connect(RIDDLE_CONTRACT_ADDRESS, signer);
         const answerEvent = contract.getEvent('AnswerAttempt');
-
 
         try {
             contract.on(answerEvent, (user: string, correct: boolean, event: any) => {
@@ -122,32 +120,25 @@ export default function Riddle() {
                     }
 
                     // stop listening for my event 
-
                     contract.off(answerEvent);
                 }
-
-
             });
 
-
-
-            const data = await contract.submitAnswer(answer);
+            // Making sure to trim the answer and convert it to lowercase for our ease of use
+            const trimmedAnswer = answer.trim().toLowerCase();
+            const data = await contract.submitAnswer(trimmedAnswer);
             console.log('data: ', data);
             await data.wait();
 
+            // Resetting answer if all was succesful
             setAnswer('');
-
-
-            // TODO: listen for answer attempt and/or winner 
         } catch (error) {
             console.error("Error guessing riddle:", error);
 
         } finally {
             setIsActive(true);
         }
-
     }
-
 
     // TODO: add suspence to loading while waiting for check for transaction
     return (
