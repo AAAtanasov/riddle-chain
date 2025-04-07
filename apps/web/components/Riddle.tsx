@@ -18,9 +18,9 @@ declare global {
 
 // TODO: env variable
 // Localhost
-const RIDDLE_CONTRACT_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+// const RIDDLE_CONTRACT_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 // Sepolia
-// const RIDDLE_CONTRACT_ADDRESS = '0x6d6DDe9c7C11bF4e0b495Ea17DF05d86e472C8a4';
+const RIDDLE_CONTRACT_ADDRESS = '0x6d6DDe9c7C11bF4e0b495Ea17DF05d86e472C8a4';
 
 // TODO: consider types for the react component
 export default function Riddle() {

@@ -8,7 +8,7 @@ import { RiddleService } from "./riddle/riddle.service";
 config({ path: path.resolve(__dirname, '../.env.local') });
 
 
-// const urlToConnect = "wss://sepolia.infura.io/ws/v3";
+const urlToConnect = "wss://sepolia.infura.io/ws/v3";
 // const urlToConnect = "https://sepolia.infura.io/v3";
 
 /**
@@ -25,7 +25,8 @@ export async function startListeners(): Promise<void> {
         }
         // const provider = new ethers.JsonRpcProvider(`${urlToConnect}/${infuraKey}`);
         // const provider = new ethers.JsonRpcProvider('http://127.0.0.1:8545/');
-        const provider = new ethers.WebSocketProvider('http://127.0.0.1:8545/');
+        // const provider = new ethers.WebSocketProvider('http://127.0.0.1:8545/');
+        const provider = new ethers.WebSocketProvider(`${urlToConnect}/${INFURA_API_KEY}`);
         console.log("Connected to provider");
 
         const riddleContract: OnchainRiddle = riddleFactory.connect(CONTRACT_ADDRESS, provider);
