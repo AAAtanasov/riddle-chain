@@ -16,7 +16,9 @@ export class RiddleService {
 
             const llmService: LLMService = new OpenAiService(openAIAPiKey);
 
-            const riddle: RiddleModel = await llmService.generateRiddle();
+            const oldRiddle: string = await contract.riddle();
+
+            const riddle: RiddleModel = await llmService.generateRiddle(oldRiddle);
             if (!riddle || !riddle.question || !riddle.answer) {
                 throw new Error("Failed to generate riddle with complete question and answer");
             }

@@ -6,12 +6,19 @@ import { RiddleModel } from "../riddle/riddle.model";
 export class OpenAiService implements LLMService {
     private readonly model: ChatOpenAI;
 
+    /**
+     * Initializes the OpenAiService with the provided API key. It sets up the OpenAI to have temperature 0.4 indicating how "creative" the model should be.
+     * @param apiKey - OpenAI API key
+     */
     constructor(apiKey: string) {
-        this.model = new ChatOpenAI({ model: "gpt-4o-mini", temperature: 0.1, openAIApiKey: apiKey });
+        this.model = new ChatOpenAI({ model: "gpt-4o-mini", temperature: 1, openAIApiKey: apiKey });
     }
 
-    public async generateRiddle(): Promise<RiddleModel> {
-        const prompt = this.getPromptMessage();
+    public async generateRiddle(oldRiddle: string): Promise<RiddleModel> {
+        if (!oldRiddle) {
+            throw new Error("Old riddle is required.");
+        }
+        const prompt = this.getPromptMessage(oldRiddle);
 
         const response = await this.model.invoke(prompt);
 
@@ -29,14 +36,15 @@ export class OpenAiService implements LLMService {
         }
     }
 
-    private getPromptMessage(): string {
+    private getPromptMessage(oldRiddle: string): string {
         // Potential expansion: could add a topic for the riddle, could add difficulty level, can use a prompt but a simple string is enough for now
         const message = `
             Generate a creative riddle with its answer. Return the response in json format following the example:
             
             {question: "string", answer: "string"}
             
-            Make it clever but not too difficult. Avoid using prepositions for the answer - make it concise and clear.
+            Avoid using prepositions for the answer - make it concise and clear.
+            The riddle must not be similar to: "${oldRiddle}".
           `;
 
         return message;
@@ -50,7 +58,8 @@ export class OpenAiService implements LLMService {
         if (match && match[1]) {
             try {
                 const test: RiddleModel = JSON.parse(match[1]);
-                return test;
+                // Need to make sure that the answer is lowercase for correct comparison
+                return { question: test.question, answer: test.answer.trim().toLowerCase() };
             } catch (error) {
                 console.error("Error parsing JSON:", error);
                 throw new Error(`Failed to parse JSON response: ${error}`);

@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 import { OnchainRiddle__factory as riddleFactory } from "../lib/typechain-types/factories"
 import { OnchainRiddle } from "../lib/typechain-types";
 
+// TODO: use after refactor sever/client components
+import { config } from "dotenv";
+
 
 // Potential fix for type of ethereum
 declare global {
@@ -16,11 +19,12 @@ declare global {
 
 // TODO: secure and listen to accountsChanged event. WARNING TO ME - changing accounts may not get the correct account, need to verify and test
 
-// TODO: env variable
+// TODO: env variable.
+// TODO: bug present when swiching networks, need to handle error fetching riddle
 // Localhost
-// const RIDDLE_CONTRACT_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+const RIDDLE_CONTRACT_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 // Sepolia
-const RIDDLE_CONTRACT_ADDRESS = '0x6d6DDe9c7C11bF4e0b495Ea17DF05d86e472C8a4';
+// const RIDDLE_CONTRACT_ADDRESS = '0x6d6DDe9c7C11bF4e0b495Ea17DF05d86e472C8a4';
 
 // TODO: consider types for the react component
 export default function Riddle() {
@@ -62,7 +66,7 @@ export default function Riddle() {
         if (!browserProvider && isWindowEthereumDefined()) {
             browserProvider = new BrowserProvider(window.ethereum);
 
-            const signer = browserProvider.getSigner();
+            // const signer = browserProvider.getSigner();
 
             return browserProvider;
         }
@@ -110,6 +114,7 @@ export default function Riddle() {
         const answerEvent = contract.getEvent('AnswerAttempt');
 
         try {
+            // todo: on RiddleSet reload
             contract.on(answerEvent, (user: string, correct: boolean, event: any) => {
                 console.log('AnswerAttempt event:', user, correct);
                 if (user === signer.address) {
