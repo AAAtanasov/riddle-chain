@@ -96,6 +96,8 @@ export default function Riddle() {
             return;
         }
 
+        console.log("Guessing riddle with answer:", answer);
+
         setIsActive(false);
         requestAccount();
 
@@ -132,6 +134,8 @@ export default function Riddle() {
             const data = await contract.submitAnswer(answer);
             console.log('data: ', data);
             await data.wait();
+
+            setAnswer('');
 
 
             // TODO: listen for answer attempt and/or winner 
