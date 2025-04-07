@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    depends_on:
+      - bot-llm
+
+  bot-llm:
+    build:
+      context: .
+      dockerfile: ./apps/bot-llm/Dockerfile
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ./apps/bot-llm/.env.local
+    restart: unless-stopped

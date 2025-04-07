@@ -16,6 +16,7 @@ declare global {
 
 // TODO: secure and listen to accountsChanged event. WARNING TO ME - changing accounts may not get the correct account, need to verify and test
 
+// TODO: env variable
 // Localhost
 const RIDDLE_CONTRACT_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 // Sepolia
