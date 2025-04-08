@@ -1,13 +1,15 @@
-'use client';
+'use server';
 
 import { BrowserProvider } from "ethers";
-import { useEffect, useState } from "react";
 
 import { OnchainRiddle__factory as riddleFactory } from "../lib/typechain-types/factories"
 import { OnchainRiddle } from "../lib/typechain-types";
 
 // TODO: use after refactor sever/client components
 import { config } from "dotenv";
+import { GuessModel } from "../lib/guess/guess.model";
+import { RiddleContents } from "./RiddleContents";
+import { addGuess } from "../lib/guess/guess.service";
 
 
 // Potential fix for type of ethereum
@@ -27,40 +29,42 @@ const RIDDLE_CONTRACT_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 // const RIDDLE_CONTRACT_ADDRESS = '0x6d6DDe9c7C11bF4e0b495Ea17DF05d86e472C8a4';
 
 // TODO: consider types for the react component
-export default function Riddle() {
-    const [riddle, setRiddle] = useState<string>('');
-    const [account, setAccount] = useState(null);
-    const [isActive, setIsActive] = useState(false);
-    const [answer, setAnswer] = useState<string>('');
+export default async function Riddle({ guessRiddleCallback }: { guessRiddleCallback: (guess: GuessModel) => void }) {
+    // const [riddle, setRiddle] = useState<string>('');
+    // const [account, setAccount] = useState(null);
+    // const [isActive, setIsActive] = useState(false);
+    // const [answer, setAnswer] = useState<string>('');
+    // const [username, setUsername] = useState<string>('');
     // let contract: OnchainRiddle;
     let browserProvider: BrowserProvider;
     // const [provider, setProvider] = useState(null);
     // const [signer, setSigner] = useState(null);
+    let riddle: string = '';
+    let account: string | null = null;
+    let isActive: boolean;
 
-    async function fetchRiddle(): Promise<void> {
-        if (isWindowEthereumDefined()) {
-            requestAccount();
-            const browserProvider = fetchBrowserProvider();
-            // TODO: define contract type from typechain
-            const contract = riddleFactory.connect(RIDDLE_CONTRACT_ADDRESS, browserProvider);
+    // async function fetchRiddle(): Promise<void> {
+    //     if (isWindowEthereumDefined()) {
+    //         requestAccount();
+    //         const browserProvider = fetchBrowserProvider();
+    //         // TODO: define contract type from typechain
+    //         const contract = riddleFactory.connect(RIDDLE_CONTRACT_ADDRESS, browserProvider);
 
-            try {
-                const data = await contract.riddle();
-                console.log("Riddle data:", data);
-                setRiddle(data);
+    //         try {
+    //             const data = await contract.riddle();
+    //             console.log("Riddle data:", data);
+    //             riddle = data;
 
-                const isActive = await contract.isActive();
-                setIsActive(isActive);
-            } catch (error) {
-                console.error("Error fetching riddle:", error);
+    //             isActive = await contract.isActive();
+    //         } catch (error) {
+    //             console.error("Error fetching riddle:", error);
 
-            }
-        }
-    }
+    //         }
+    //     }
+    // }
 
-    useEffect(() => {
-        fetchRiddle();
-    }, []);
+    // await fetchRiddle();
+
 
     function fetchBrowserProvider(): BrowserProvider {
         if (!browserProvider && isWindowEthereumDefined()) {
@@ -96,34 +100,49 @@ export default function Riddle() {
         }
     }
 
-    async function guessRiddle(): Promise<void> {
-        if (!isActive || !answer || answer.trim() === '') {
+    async function storeShit(guess: GuessModel): Promise<void> {
+        'use server';
+        await addGuess(guess);
+    }
+
+
+
+    async function guessRiddle(guess: GuessModel, contract: OnchainRiddle): Promise<void> {
+        'use server';
+        if (!guess) {
+            console.error("Guess is null or undefined");
             return;
         }
+        // const isActive = await contract.isActive();
 
-        console.log("Guessing riddle with answer:", answer);
+        // if (!isActive || !guess.answer || guess.answer.trim() === '') {
+        //     console.error(`Riddle is not active or answer is empty, isActive: ${isActive}, answer: ${guess.answer}`);
+        //     return;
+        // }
 
-        setIsActive(false);
-        requestAccount();
+        console.log("Guessing riddle with answer:", guess.answer);
 
-        const browserProvider = fetchBrowserProvider();
-        const signer = await browserProvider.getSigner();
-        console.log("Signer: ", signer);
+        // requestAccount();
 
-        const contract: OnchainRiddle = riddleFactory.connect(RIDDLE_CONTRACT_ADDRESS, signer);
+        // const browserProvider = fetchBrowserProvider();
+        // const signer = await browserProvider.getSigner();
+        // console.log("Signer: ", signer);
+
+        // const contract: OnchainRiddle = riddleFactory.connect(RIDDLE_CONTRACT_ADDRESS, signer);
         const answerEvent = contract.getEvent('AnswerAttempt');
 
         try {
             // todo: on RiddleSet reload
             contract.on(answerEvent, (user: string, correct: boolean, event: any) => {
                 console.log('AnswerAttempt event:', user, correct);
-                if (user === signer.address) {
+                if (user === guess.wallet) {
                     console.log('You guessed the riddle!');
                     if (correct) {
                         console.log('Correct answer!');
                     } else {
                         console.log('Incorrect answer.');
                     }
+                    // store guess here 
 
                     // stop listening for my event 
                     contract.off(answerEvent);
@@ -131,29 +150,22 @@ export default function Riddle() {
             });
 
             // Making sure to trim the answer and convert it to lowercase for our ease of use
-            const trimmedAnswer = answer.trim().toLowerCase();
+            const trimmedAnswer = guess.answer.trim().toLowerCase();
             const data = await contract.submitAnswer(trimmedAnswer);
             console.log('data: ', data);
             await data.wait();
 
             // Resetting answer if all was succesful
-            setAnswer('');
+            // setAnswer('');
         } catch (error) {
             console.error("Error guessing riddle:", error);
 
-        } finally {
-            setIsActive(true);
         }
     }
 
     // TODO: add suspence to loading while waiting for check for transaction
     return (
-        <div className="flex flex-col space-y-4">
-            <h1>Riddle</h1>
-            <label htmlFor="answer" className="text-2xl">Answer: {riddle}</label>
-            <input id="answer" name="answer" type="text" className="p-4 m-2 bg-slate-300 rounded-xl border-4 border-lime-400" placeholder="Type your answer here..." value={answer} onChange={(e) => setAnswer(e.target.value)} />
-            <button className="p-4 bg-lime-400 rounded-xl" disabled={!isActive} onClick={guessRiddle}>Submit</button>
-        </div>
+        <RiddleContents riddle={riddle} guessRiddleCallback={storeShit} />
     )
 
 }

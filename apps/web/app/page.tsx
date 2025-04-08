@@ -1,6 +1,14 @@
 import Riddle from "../components/Riddle";
+import { GuessModel } from "../lib/guess/guess.model";
+import { addGuess } from "../lib/guess/guess.service";
 
 export default function Page() {
+
+  const guessRiddle = async (riddle: GuessModel) => {
+    console.log("guessRiddle called with:", riddle);
+    const response = await addGuess(riddle);
+    console.log(response);
+  };
 
   return (
     <main className="flex items-center justify-center min-h-screen p-24">
@@ -27,7 +35,7 @@ export default function Page() {
         <button className="mt-4 bg-lime-400 p-4 rounded-xl ">Submit riddle</button>
 
         <div className="flex">
-          <Riddle />
+          <Riddle guessRiddleCallback={guessRiddle} />
 
         </div>
       </div>
