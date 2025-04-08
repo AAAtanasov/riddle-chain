@@ -26,12 +26,18 @@ export default async function Riddle() {
     return (
         <div className="flex flex-col m-6 space-y-10 bg-white shadow-2xl rounded-2xl md:flex-row md:space-y-0 md:m-0">
             <div className="p-20 md:p-20">
-                <h2 className="mb-2 text-3xl font-bold text-center">Guess a riddle!</h2>
-                <p className="max-w-md text-gray-500 text-center ">
-                    Can you guess the answer? Connect your wallet and enter your name to give it a try!
-                </p>
+                <div className="max-w-md">
+                    <h2 className="mb-2 text-3xl font-bold text-center">Guess a riddle!</h2>
+                    <p className=" text-gray-500 text-center ">
+                        Can you guess the answer? Connect your wallet and enter your name to give it a try!
+                    </p>
+                </div>
+
                 <Suspense fallback={<div className="text-center">Loading riddle...</div>}>
-                    <RiddleContents contractAddress={CONTRACT_ADDRESS || ''} guessRiddleCallback={storeGuess} />
+                    <div className="max-w-md">
+                        <RiddleContents contractAddress={CONTRACT_ADDRESS || ''} guessRiddleCallback={storeGuess} />
+
+                    </div>
 
                 </Suspense>
             </div>

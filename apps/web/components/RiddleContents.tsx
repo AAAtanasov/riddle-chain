@@ -264,16 +264,16 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
                 </>
             )}
             {riddle ? (
-                <div className="flex justify-between items-center my-6 mx-4 text-center max-w-md">
+                <div className="flex justify-between items-center my-6 mx-4 text-center">
                     <p className=" text-2xl font-bold">{riddle}</p>
                 </div>) : (
-                <div className="flex justify-between items-center my-6 mx-4 text-center max-w-md">
+                <div className="flex justify-between items-center my-6 mx-4 text-center">
                     <p className=" text-2xl text-gray-500">Loading...</p>
                 </div>
             )}
 
             {!!guessResult && (
-                <div className="flex max-w-md items-center justify-center">
+                <div className="flex items-center justify-center">
                     <div className={`w-full my-4 p-3 rounded-md text-center ${guessResult.isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} `} >
                         {guessResult.feedback}
                     </div >
