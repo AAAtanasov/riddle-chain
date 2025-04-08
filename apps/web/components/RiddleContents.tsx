@@ -5,6 +5,8 @@ import { GuessModel } from "../lib/guess/guess.model";
 import { BrowserProvider } from "ethers";
 import { OnchainRiddle } from "../lib/typechain-types";
 import { OnchainRiddle__factory as riddleFactory } from "../lib/typechain-types/factories"
+import { GuessResult } from "../lib/guess/guess-result";
+import Link from "next/link";
 
 
 declare global {
@@ -19,7 +21,6 @@ export interface RiddleProps {
 }
 
 export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleProps) {
-    const [isActive, setIsActive] = useState(false);
     const [answer, setAnswer] = useState<string>('');
     const [username, setUsername] = useState<string>('');
 
@@ -30,6 +31,10 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
     const [account, setAccount] = useState<string | undefined>(undefined);
     const [riddle, setRiddle] = useState<string>('');
     const [isRiddleSolved, setIsRiddleSolved] = useState<boolean>(false);
+    const [isGuessing, setIsGuessing] = useState(false);
+    // const [guessResult, setGuessResult] = useState<GuessResult | null>(null);
+    const [guessResult, setGuessResult] = useState<GuessResult | null>(null);
+
 
     useEffect(() => {
         if (typeof window !== 'undefined' && window.ethereum) {
@@ -60,8 +65,8 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
             console.log("Riddle data:", data);
             setRiddle(data);
 
-            const isRiddleSolved = await contract.isActive();
-            setIsRiddleSolved(isRiddleSolved);
+            const isRiddleActive = await contract.isActive();
+            setIsRiddleSolved(!isRiddleActive);
         } catch (error) {
             console.error("Error fetching riddle:", error);
         }
@@ -131,13 +136,20 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
 
     const attemptGuess = async () => {
         console.log('Attempting guess...');
-        if (isActive) {
+        if (isGuessing) {
             console.log('Already guessing...');
+            setError('Already guessing. Please wait.');
             return;
         }
-        setIsActive(false);
 
-        // TODO: validation
+        if (isRiddleSolved) {
+            setError('Riddle is solved. Please wait shortly for a new one.');
+        }
+
+        setIsGuessing(true);
+        setError(null);
+        setGuessResult(null);
+
         const guessModel: GuessModel = {
             answer,
             username,
@@ -160,17 +172,28 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
             // todo: on RiddleSet reload
             contract.on(answerEvent, (user: string, correct: boolean, event: any) => {
                 console.log('AnswerAttempt event:', user, correct);
-                if (user === account) {
+                debugger;
+                if (user.toLowerCase() === account) {
                     console.log('You guessed the riddle!');
                     if (correct) {
                         console.log('Correct answer!');
                         setIsRiddleSolved(true);
+                        setGuessResult({
+                            isCorrect: true,
+                            feedback: 'Correct answer! You solved the riddle!',
+                        })
                     } else {
                         console.log('Incorrect answer.');
+                        setGuessResult({
+                            isCorrect: false,
+                            feedback: 'Unfortunetely this was the wrong answer. Feel free to try again!',
+                        })
                     }
                     // store guess here 
 
                     // stop listening for my event 
+                    setIsGuessing(false);
+
                     contract.off(answerEvent);
                 }
             });
@@ -184,14 +207,9 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
 
             // Resetting answer if all was succesful
             setAnswer('');
-            // await 
         } catch (error) {
             console.error("Error guessing riddle:", error);
-
         }
-
-        // setAnswer('');
-        setIsActive(true);
     }
 
     const displaySlicedWallet = (wallet: string) => {
@@ -202,79 +220,80 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
     }
 
     return (
-        <div className="flex flex-col m-6 space-y-10 bg-white shadow-2xl rounded-2xl md:flex-row md:space-y-0 md:m-0">
-            <div className="p-20 md:p-20">
-                {/* Top content */}
-                <h2 className="mb-2 text-3xl font-bold text-center">Guess a riddle!</h2>
-                <p className="max-w-sm text-gray-500 text-center ">
-                    Can you guess the answer? Connect your wallet and enter your name to give it a try!
-                </p>
-                {!!error && (
-                    <div className="my-4 p-3 bg-red-100 text-red-700 rounded text-center">
-                        {error}
-                    </div>
-                )}
+        <>
+            {!!error && (
+                <div className="flex max-w-md my-4 p-3 bg-red-100 text-red-700 rounded text-center">
+                    {error}
+                </div>
+            )}
 
-                <div className="flex mt-4 items-center justify-center">
-                    {isConnected ? (
-                        <div className="space-y-3">
-                            <button
-                                onClick={disconnectWallet}
-                                className="p-2 bg-orange-500 text-white rounded hover:bg-red-600"
-                            >
-                                Disconnect Wallet
-                            </button>
-                        </div>
-                    ) : (
+            <div className="flex mt-4 items-center justify-center">
+                {isConnected ? (
+                    <div className="space-y-3">
                         <button
-                            onClick={connectWallet}
-                            disabled={!provider}
-                            className="px-4 py-2 bg-lime-500 text-white rounded hover:bg-green-600 disabled:bg-gray-400"
+                            onClick={disconnectWallet}
+                            className="p-2 bg-orange-500 text-white rounded hover:bg-red-600"
                         >
-                            Connect MetaMask Wallet
+                            Disconnect Wallet
                         </button>
-                    )}
-                </div>
-
-                {!!account && (
-                    <>
-                        <div className="flex justify-between items-center my-6">
-                            <p className="font-semibold">Connected Account:</p>
-                            <p className="text-gray-500">{displaySlicedWallet(account)}</p>
-                        </div>
-                        <div className="flex justify-between items-center my-6">
-                            <p className="font-semibold">Alias</p>
-                            <input type="text" required className="w-1/2 p-4 border border-gray-300 rounded-md placeholder:font-light" placeholder="Alias"
-                                value={username} onChange={(e) => setUsername(e.target.value)} />
-
-                        </div>
-                    </>
-                )}
-                {riddle ? (
-                    <div className="flex justify-between items-center my-6 mx-4 text-center max-w-sm">
-                        <p className=" text-2xl font-bold">{riddle}</p>
-                    </div>) : (
-                    <div className="flex justify-between items-center my-6 mx-4 text-center max-w-sm">
-                        <p className=" text-2xl text-gray-500">Loading...</p>
                     </div>
+                ) : (
+                    <button
+                        onClick={connectWallet}
+                        disabled={!provider}
+                        className="px-4 py-2 bg-lime-500 text-white rounded hover:bg-green-600 disabled:bg-gray-400"
+                    >
+                        Connect MetaMask Wallet
+                    </button>
                 )}
+            </div>
 
-                <input type="text" className="w-full p-4 border border-gray-300 rounded-md placeholder:font-light" placeholder="Enter your guess..."
-                    value={answer} onChange={(e) => setAnswer(e.target.value)} />
+            {!!account && (
+                <>
+                    <div className="flex justify-between items-center my-6">
+                        <p className="font-semibold">Connected Account:</p>
+                        <p className="text-gray-500">{displaySlicedWallet(account)}</p>
+                    </div>
+                    <div className="flex justify-between items-center my-6">
+                        <p className="font-semibold">Alias</p>
+                        <input type="text" required className="w-1/2 p-4 border border-gray-300 rounded-md placeholder:font-light" placeholder="Alias"
+                            value={username} onChange={(e) => setUsername(e.target.value)} />
 
-                <div className="flex flex-col items-center mt-8">
-                    <button disabled={!isConnected} onClick={attemptGuess} className="w-full md:width-auto flex justify-center
+                    </div>
+                </>
+            )}
+            {riddle ? (
+                <div className="flex justify-between items-center my-6 mx-4 text-center max-w-sm">
+                    <p className=" text-2xl font-bold">{riddle}</p>
+                </div>) : (
+                <div className="flex justify-between items-center my-6 mx-4 text-center max-w-sm">
+                    <p className=" text-2xl text-gray-500">Loading...</p>
+                </div>
+            )}
+
+            {!!guessResult && (
+                <div className="flex max-w-md items-center justify-center">
+                    <div className={`w-full my-4 p-3 rounded-md text-center ${guessResult.isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} `} >
+                        {guessResult.feedback}
+                    </div >
+                </div>
+
+            )
+            }
+
+            <input type="text" className="w-full p-4 border border-gray-300 rounded-md placeholder:font-light" placeholder="Enter your guess..."
+                value={answer} onChange={(e) => setAnswer(e.target.value)} />
+
+            <div className="flex flex-col items-center mt-8">
+                <button disabled={!isConnected || isRiddleSolved || isGuessing} onClick={attemptGuess} className="w-full md:width-auto flex justify-center
                      items-center p-6 font-bold rounded-md  disabled:bg-gray-500
-                    shadow-lg px-9 bg-lime-500 hover:bg-opacity-90 hover:shadow-lg border transition hover:-translate-y-0.5 duration-250" >Submit</button>
-                </div>
+                    shadow-lg px-9 bg-lime-500 hover:bg-opacity-90 hover:shadow-lg border transition hover:-translate-y-0.5 duration-250" >{isGuessing ? 'Guessing...' : 'Submit'}</button>
+            </div>
 
-                <div className="flex">
-                    View history...
-
-                </div>
-
+            <div className="flex items-center justify-center mt-8">
+                <Link href="/history" className="text-blue-500 hover:underline">View history...</Link>
 
             </div>
-        </div>
+        </>
     );
 }
