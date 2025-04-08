@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { ethers, WebSocketProvider } from "ethers";
 import { OnchainRiddle, OnchainRiddle__factory as riddleFactory } from "./lib/typechain-types";
 import { config } from "dotenv";
 import path from "path";
@@ -8,7 +8,8 @@ import { RiddleService } from "./riddle/riddle.service";
 config({ path: path.resolve(__dirname, '../.env.local') });
 
 
-// const urlToConnect = "wss://sepolia.infura.io/ws/v3";
+const SEPOLIA_ENDPOINT = 'wss://sepolia.infura.io/ws/v3';
+const HARDHAT_ENDPOINT = 'http://127.0.0.1:8545/';
 // const urlToConnect = "https://sepolia.infura.io/v3";
 
 /**
@@ -19,13 +20,17 @@ config({ path: path.resolve(__dirname, '../.env.local') });
  */
 export async function startListeners(): Promise<void> {
     try {
-        const { CONTRACT_ADDRESS, INFURA_API_KEY, OPENAI_API_KEY, DEPLOYER_PRIVATE_KEY } = process.env;
-        if (!CONTRACT_ADDRESS || !INFURA_API_KEY || !OPENAI_API_KEY || !DEPLOYER_PRIVATE_KEY) {
+        const { CONTRACT_ADDRESS, INFURA_API_KEY, OPENAI_API_KEY, DEPLOYER_PRIVATE_KEY, IS_HARDHAT } = process.env;
+        if (!CONTRACT_ADDRESS || !OPENAI_API_KEY || !DEPLOYER_PRIVATE_KEY) {
             throw new Error("Missing required environment variables");
         }
-        // const provider = new ethers.JsonRpcProvider(`${urlToConnect}/${infuraKey}`);
-        // const provider = new ethers.JsonRpcProvider('http://127.0.0.1:8545/');
-        const provider = new ethers.WebSocketProvider('http://127.0.0.1:8545/');
+
+        if (IS_HARDHAT && !INFURA_API_KEY) {
+            throw new Error("Missing INFURA_API_KEY environment variable for sepolia endpoint");
+        }
+
+        const urlToConnect = IS_HARDHAT ? HARDHAT_ENDPOINT : `${SEPOLIA_ENDPOINT}/${INFURA_API_KEY}`;
+        const provider = new ethers.WebSocketProvider(urlToConnect);
         console.log("Connected to provider");
 
         const riddleContract: OnchainRiddle = riddleFactory.connect(CONTRACT_ADDRESS, provider);
@@ -38,13 +43,21 @@ export async function startListeners(): Promise<void> {
             console.log(`[${timestamp}] Someone sollved the current riddle! Winner: ${winnerAddress}. Fetching a new one...`);
 
             // generate contract with signer credentials 
-            const wallet = new ethers.Wallet(DEPLOYER_PRIVATE_KEY, provider);
-            const signerContract = riddleFactory.connect(CONTRACT_ADDRESS, wallet);
+            // const wallet = new ethers.Wallet(DEPLOYER_PRIVATE_KEY, provider);
+            // const signerContract = riddleFactory.connect(CONTRACT_ADDRESS, wallet);
 
-            withRetry(() => RiddleService.setNewRiddle(OPENAI_API_KEY, signerContract));
+            // withRetry(() => RiddleService.setNewRiddle(OPENAI_API_KEY, signerContract));
+            setRiddleInContract(DEPLOYER_PRIVATE_KEY, provider, CONTRACT_ADDRESS, OPENAI_API_KEY);
         });
 
         console.log('Event listeners initialized. Waiting for events...');
+
+        // check if riddle is solved on start and not updated yet
+        const isRiddleSet = await riddleContract.isActive();
+        if (!isRiddleSet) {
+            console.log("Riddle is not set. Setting a new one...");
+            setRiddleInContract(DEPLOYER_PRIVATE_KEY, provider, CONTRACT_ADDRESS, OPENAI_API_KEY);
+        }
 
         process.stdin.resume();
 
@@ -58,7 +71,18 @@ export async function startListeners(): Promise<void> {
 
     } catch (error) {
         console.error('Error in event listener:', error);
-        // TODO: send notification that server is down or restart...
         process.exit(1);
     }
+}
+
+async function setRiddleInContract(
+    deployerKey: string,
+    provider: WebSocketProvider,
+    contractAddress: string,
+    aiKey: string):
+    Promise<void> {
+    const wallet = new ethers.Wallet(deployerKey, provider);
+    const signerContract = riddleFactory.connect(contractAddress, wallet);
+
+    withRetry(() => RiddleService.setNewRiddle(aiKey, signerContract));
 }

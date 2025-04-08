@@ -9,6 +9,6 @@ try {
 
     main();
 } catch (error) {
-    // TODO: handle with winston, make sure that the process doesn't die on error and keeps running
+    // Potential improvement: handle with winston, make sure that the process doesn't die on error and keeps running
     console.error("Error in bot-llm:", error);
 }

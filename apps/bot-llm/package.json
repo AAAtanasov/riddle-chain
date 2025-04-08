@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Bot responsible for tracking riddle events from blockchain and publishing new riddles.",
   "main": "index.js",
+  "packageManager": "pnpm@8.15.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint . --ext .ts",
