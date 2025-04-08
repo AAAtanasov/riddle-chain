@@ -19,3 +19,18 @@ export async function addGuess(guessDto: GuessModel): Promise<GuessModel> {
     }
 
 }
+
+export async function getGuesses(): Promise<GuessModel[]> {
+    try {
+        const guesses = await prisma.guess.findMany({
+            orderBy: {
+                createdAt: "desc"
+            }
+        });
+
+        return guesses;
+    } catch (error) {
+        console.error("Error in getGuesses:", error);
+        throw error;
+    }
+}

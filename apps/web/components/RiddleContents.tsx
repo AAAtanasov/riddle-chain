@@ -256,17 +256,17 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
                     </div>
                     <div className="flex justify-between items-center my-6">
                         <p className="font-semibold">Alias</p>
-                        <input type="text" required className="w-1/2 p-4 border border-gray-300 rounded-md placeholder:font-light" placeholder="Alias"
+                        <input type="text" id="alias" name="alias" required className="w-1/2 p-4 border border-gray-300 rounded-md placeholder:font-light" placeholder="Alias"
                             value={username} onChange={(e) => setUsername(e.target.value)} />
 
                     </div>
                 </>
             )}
             {riddle ? (
-                <div className="flex justify-between items-center my-6 mx-4 text-center max-w-sm">
+                <div className="flex justify-between items-center my-6 mx-4 text-center max-w-md">
                     <p className=" text-2xl font-bold">{riddle}</p>
                 </div>) : (
-                <div className="flex justify-between items-center my-6 mx-4 text-center max-w-sm">
+                <div className="flex justify-between items-center my-6 mx-4 text-center max-w-md">
                     <p className=" text-2xl text-gray-500">Loading...</p>
                 </div>
             )}
