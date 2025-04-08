@@ -75,7 +75,7 @@ export async function startListeners(): Promise<void> {
     }
 }
 
-async function setRiddleInContract(
+export async function setRiddleInContract(
     deployerKey: string,
     provider: WebSocketProvider,
     contractAddress: string,
