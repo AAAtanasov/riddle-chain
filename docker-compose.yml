@@ -9,16 +9,34 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
+      - DATABASE_URL=postgresql://user:password@postgres:5432/nextapp?schema=public
     restart: unless-stopped
     depends_on:
-      - bot-llm
+      - postgres
+    # depends_on:
+    #   - bot-llm
+    # Need to figure out how to make this work...
+    # bot-llm:
+    #   build:
+    #     context: .
+    #     dockerfile: ./apps/bot-llm/Dockerfile
+    #   environment:
+    #     - NODE_ENV=production
+    #   env_file:
+    #     - ./apps/bot-llm/.env.local
+    #   restart: unless-stopped
 
-  bot-llm:
-    build:
-      context: .
-      dockerfile: ./apps/bot-llm/Dockerfile
+    # Postgres
+  postgres:
+    image: postgres:15
     environment:
-      - NODE_ENV=production
-    env_file:
-      - ./apps/bot-llm/.env.local
-    restart: unless-stopped
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=nextapp
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres-data:
