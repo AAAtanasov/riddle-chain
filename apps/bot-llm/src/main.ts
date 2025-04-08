@@ -1,6 +1,6 @@
 import { startListeners } from "./bot-server";
 
-async function main() {
+export async function main() {
     await startListeners();
 }
 

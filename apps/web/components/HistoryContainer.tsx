@@ -1,4 +1,3 @@
-import { FC } from "react";
 import { GuessModel } from "../lib/guess/guess.model";
 import { GuessTable } from "./GuessTable";
 

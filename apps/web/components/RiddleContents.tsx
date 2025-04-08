@@ -11,6 +11,7 @@ import Link from "next/link";
 
 declare global {
     interface Window {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ethereum?: any;
     }
 }
@@ -25,7 +26,7 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
     const [username, setUsername] = useState<string>('');
 
     const [provider, setProvider] = useState<BrowserProvider | null>(null);
-    const [network, setNetwork] = useState<string | null>(null);
+    const [, setNetwork] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [isConnected, setIsConnected] = useState(false);
     const [account, setAccount] = useState<string | undefined>(undefined);
@@ -57,6 +58,7 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
         } else {
             setError('MetaMask is not installed. Please install it to use this feature.');
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     async function fetchRiddle(contract: OnchainRiddle) {
@@ -170,9 +172,8 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
 
         try {
             // todo: on RiddleSet reload
-            contract.on(answerEvent, (user: string, correct: boolean, event: any) => {
+            contract.on(answerEvent, (user: string, correct: boolean) => {
                 console.log('AnswerAttempt event:', user, correct);
-                debugger;
                 if (user.toLowerCase() === account) {
                     console.log('You guessed the riddle!');
                     if (correct) {
