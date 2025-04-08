@@ -30,7 +30,7 @@ export class OpenAiService implements LLMService {
 
             return riddle;
         } else {
-            // TODO: consider global  error handling library as winston
+            // Potential improvement: consider global  error handling library as winston
             console.error(response);
             throw new Error("No response from OpenAI");
         }

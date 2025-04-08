@@ -4,7 +4,7 @@ import { config } from 'dotenv';
 // import path from 'path';
 // config({ path: path.resolve(__dirname, '../.env.local') });
 
-// TODO: consider configuration
+// TODO: consider configuration - not prod safe yet
 // const { NODE_ENV } = process.env;
 
 // PrismaClient is attached to the `global` object in development to prevent

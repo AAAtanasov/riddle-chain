@@ -27,7 +27,7 @@ export async function startListeners(): Promise<void> {
 
         if (IS_HARDHAT && !INFURA_API_KEY) {
             throw new Error("Missing INFURA_API_KEY environment variable for sepolia endpoint");
-        } 
+        }
 
         const urlToConnect = IS_HARDHAT ? HARDHAT_ENDPOINT : `${SEPOLIA_ENDPOINT}/${INFURA_API_KEY}`;
         const provider = new ethers.WebSocketProvider(urlToConnect);
@@ -71,7 +71,6 @@ export async function startListeners(): Promise<void> {
 
     } catch (error) {
         console.error('Error in event listener:', error);
-        // TODO: send notification that server is down or restart...
         process.exit(1);
     }
 }
