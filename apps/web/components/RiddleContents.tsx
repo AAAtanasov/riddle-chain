@@ -62,12 +62,28 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
 
     const fetchRiddle = async (contract: OnchainRiddle) => {
         try {
-            const data = await contract.riddle();
-            console.log("Riddle data:", data);
-            setRiddle(data);
+            try {
+                // Possible issue: when on Sepolia and attempting to read from Hardhat no error is thrown. Works for other networks, TODO.
+                let data;
+                try {
+                    data = await contract.riddle();
+                } catch (error) {
+                    setError('Failed to fetch riddle. Are you sure you are on the correct network?');
+                    console.error("Error fetching riddle:", error);
+                    return;
 
-            const isRiddleActive = await contract.isActive();
-            setIsRiddleSolved(!isRiddleActive);
+                }
+
+                console.log("Riddle data:", data);
+                setRiddle(data);
+
+                const isRiddleActive = await contract.isActive();
+                setIsRiddleSolved(!isRiddleActive);
+            } catch (error) {
+                console.error("Error fetching riddle:", error);
+                setError('Failed to fetch riddle. Are you sure you are on the correct network?');
+            }
+
         } catch (error) {
             console.error("Error fetching riddle:", error);
         }
@@ -119,9 +135,14 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
         }
     };
 
-    const handleChainChanged = () => {
+    const handleChainChanged = async () => {
+        setError(null);
         if (provider) {
             updateNetwork(provider);
+        } else {
+            const ethersProvider = new BrowserProvider(window.ethereum);
+            setProvider(ethersProvider);
+            await fetchRiddle(riddleFactory.connect(contractAddress, ethersProvider!));
         }
     };
 
@@ -137,18 +158,8 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
 
     const attemptGuess = async () => {
         console.log('Attempting guess...');
-        if (isGuessing) {
-            console.log('Already guessing...');
-            setError('Already guessing. Please wait.');
-            return;
-        }
-
-        if (isRiddleSolved) {
-            setError('Riddle is solved. Please wait shortly for a new one.');
-        }
-
-        if (!account) {
-            setError('Please connect your wallet first.');
+        const isValid = isInputValid();
+        if (!isValid) {
             return;
         }
 
@@ -175,7 +186,6 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
         const answerEvent = contract.getEvent('AnswerAttempt');
 
         try {
-            // todo: on RiddleSet reload
             contract.on(answerEvent, async (user: string, correct: boolean) => {
                 console.log('AnswerAttempt event:', user, correct);
                 if (user.toLowerCase() === account) {
@@ -218,6 +228,7 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
             setAnswer('');
         } catch (error) {
             console.error("Error guessing riddle:", error);
+            setIsGuessing(false);
         }
     }
 
@@ -230,11 +241,40 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
         }, 20000);
     }
 
+    const isInputValid = (): boolean => {
+        if (isGuessing) {
+            console.log('Already guessing...');
+            setError('Already guessing. Please wait.');
+            return false;
+        }
+
+        if (isRiddleSolved) {
+            setError('Riddle is solved. Please wait shortly for a new one.');
+            return false;
+        }
+
+        if (!account) {
+            setError('Please connect your wallet first.');
+            return false;
+        }
+
+        if (!/\S/.test(answer)) {
+            setError('Please enter a valid answer, not empty spaces...');
+            return false;
+        }
+
+        return true;
+    }
+
     const displaySlicedWallet = (wallet: string) => {
         if (wallet.length > 10) {
             return `${wallet.slice(0, 6)}...${wallet.slice(-4)}`;
         }
         return wallet;
+    }
+
+    const isSubmitActive = (): boolean => {
+        return /\S/.test(answer) && isConnected && !isRiddleSolved && !isGuessing;
     }
 
     return (
@@ -275,7 +315,7 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
                     <div className="flex justify-between items-center my-6">
                         <p className="font-semibold">Alias</p>
                         <input type="text" id="alias" name="alias" required className="w-1/2 p-4 border border-gray-300 rounded-md placeholder:font-light" placeholder="Alias"
-                            value={username} onChange={(e) => setUsername(e.target.value)} />
+                            value={username} onChange={(e) => setUsername(e.target.value)} maxLength={50} />
 
                     </div>
                 </>
@@ -300,10 +340,10 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
             }
 
             <input type="text" className="w-full p-4 border border-gray-300 rounded-md placeholder:font-light" placeholder="Enter your guess..."
-                value={answer} onChange={(e) => setAnswer(e.target.value)} />
+                value={answer} onChange={(e) => setAnswer(e.target.value)} maxLength={50} />
 
             <div className="flex flex-col items-center mt-8">
-                <button disabled={!isConnected || isRiddleSolved || isGuessing} onClick={attemptGuess} className="w-full md:width-auto flex justify-center
+                <button disabled={!isSubmitActive()} onClick={attemptGuess} className="w-full md:width-auto flex justify-center
                      items-center p-6 font-bold rounded-md  disabled:bg-gray-500
                     shadow-lg px-9 bg-lime-500 hover:bg-opacity-90 hover:shadow-lg border transition hover:-translate-y-0.5 duration-250" >{isGuessing ? 'Guessing...' : 'Submit'}</button>
             </div>
