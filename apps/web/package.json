@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "next lint --max-warnings 0",
     "check-types": "tsc --noEmit",
-    "init-prisma": "npx prisma migrate dev --name init"
+    "init-prisma": "DATABASE_URL=postgresql://user:password@localhost:5432/nextapp?schema=public npx prisma migrate dev --name init"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",

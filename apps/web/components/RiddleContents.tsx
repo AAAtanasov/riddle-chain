@@ -62,12 +62,18 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
 
     const fetchRiddle = async (contract: OnchainRiddle) => {
         try {
-            const data = await contract.riddle();
-            console.log("Riddle data:", data);
-            setRiddle(data);
+            try {
+                const data = await contract.riddle();
+                console.log("Riddle data:", data);
+                setRiddle(data);
 
-            const isRiddleActive = await contract.isActive();
-            setIsRiddleSolved(!isRiddleActive);
+                const isRiddleActive = await contract.isActive();
+                setIsRiddleSolved(!isRiddleActive);
+            } catch (error) {
+                console.error("Error fetching riddle:", error);
+                setError('Failed to fetch riddle. Are you sure you are on the correct network?');
+            }
+
         } catch (error) {
             console.error("Error fetching riddle:", error);
         }
@@ -119,9 +125,14 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
         }
     };
 
-    const handleChainChanged = () => {
+    const handleChainChanged = async () => {
+        setError(null);
         if (provider) {
             updateNetwork(provider);
+        } else {
+            const ethersProvider = new BrowserProvider(window.ethereum);
+            setProvider(ethersProvider);
+            await fetchRiddle(riddleFactory.connect(contractAddress, ethersProvider!));
         }
     };
 

@@ -25,7 +25,7 @@ export async function startListeners(): Promise<void> {
             throw new Error("Missing required environment variables");
         }
 
-        if (IS_HARDHAT && !INFURA_API_KEY) {
+        if (!IS_HARDHAT && !INFURA_API_KEY) {
             throw new Error("Missing INFURA_API_KEY environment variable for sepolia endpoint");
         }
 
