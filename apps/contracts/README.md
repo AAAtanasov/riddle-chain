@@ -1,13 +1,13 @@
-# Sample Hardhat Project
+# Contracts project
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+This project contains the `OnchainRiddle.sol` contract and the test that came with it. It has a script inside it that utilizes Hardhat ignition modules in order to deploy the smart contract. It is used for local development to start a local hardhat node that can be used for development using 
 
-Try running some of the following tasks:
+> `npx hardhat node`
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.ts
-```
+It contains the typechain dependency, which was used to generate the types for the smart contract. The current configuration is defined for:
+
+- localhost
+- sepolia
+
+Make sure to add your `.env` variables correctly in order to deploy a contract. Instructions on which variable does what can be seen in the main README.
+
