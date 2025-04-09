@@ -24,7 +24,6 @@ export interface RiddleProps {
 export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleProps) {
     const [answer, setAnswer] = useState<string>('');
     const [username, setUsername] = useState<string>('');
-
     const [provider, setProvider] = useState<BrowserProvider | null>(null);
     const [, setNetwork] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -33,7 +32,6 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
     const [riddle, setRiddle] = useState<string>('');
     const [isRiddleSolved, setIsRiddleSolved] = useState<boolean>(false);
     const [isGuessing, setIsGuessing] = useState(false);
-    // const [guessResult, setGuessResult] = useState<GuessResult | null>(null);
     const [guessResult, setGuessResult] = useState<GuessResult | null>(null);
 
 
@@ -61,7 +59,8 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    async function fetchRiddle(contract: OnchainRiddle) {
+
+    const fetchRiddle = async (contract: OnchainRiddle) => {
         try {
             const data = await contract.riddle();
             console.log("Riddle data:", data);
@@ -148,6 +147,11 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
             setError('Riddle is solved. Please wait shortly for a new one.');
         }
 
+        if (!account) {
+            setError('Please connect your wallet first.');
+            return;
+        }
+
         setIsGuessing(true);
         setError(null);
         setGuessResult(null);
@@ -155,7 +159,7 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
         const guessModel: GuessModel = {
             answer,
             username,
-            id: 0,
+            id: '0',
             wallet: account!,
             isCorrect: false,
             createdAt: new Date(),
@@ -172,7 +176,7 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
 
         try {
             // todo: on RiddleSet reload
-            contract.on(answerEvent, (user: string, correct: boolean) => {
+            contract.on(answerEvent, async (user: string, correct: boolean) => {
                 console.log('AnswerAttempt event:', user, correct);
                 if (user.toLowerCase() === account) {
                     console.log('You guessed the riddle!');
@@ -181,20 +185,25 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
                         setIsRiddleSolved(true);
                         setGuessResult({
                             isCorrect: true,
-                            feedback: 'Correct answer! You solved the riddle!',
+                            feedback: 'Correct answer! You solved the riddle! A fresh one will be loaded soon!',
                         })
+                        guessModel.isCorrect = true;
+                        await guessRiddleCallback(guessModel);
+
+                        reloadRiddle();
+
                     } else {
                         console.log('Incorrect answer.');
                         setGuessResult({
                             isCorrect: false,
                             feedback: 'Unfortunetely this was the wrong answer. Feel free to try again!',
                         })
+                        await guessRiddleCallback(guessModel);
+
                     }
-                    // store guess here 
 
-                    // stop listening for my event 
                     setIsGuessing(false);
-
+                    // stop listening for my event 
                     contract.off(answerEvent);
                 }
             });
@@ -203,7 +212,6 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
             const trimmedAnswer = answer.trim().toLowerCase();
             const data = await contract.submitAnswer(trimmedAnswer);
             console.log('data: ', data);
-            await guessRiddleCallback(guessModel);
             await data.wait();
 
             // Resetting answer if all was succesful
@@ -211,6 +219,15 @@ export function RiddleContents({ contractAddress, guessRiddleCallback }: RiddleP
         } catch (error) {
             console.error("Error guessing riddle:", error);
         }
+    }
+
+    const reloadRiddle = () => {
+        const contract = riddleFactory.connect(contractAddress, provider!);
+        setTimeout(async () => {
+            console.log('reloading');
+            await fetchRiddle(contract);
+            setGuessResult(null);
+        }, 20000);
     }
 
     const displaySlicedWallet = (wallet: string) => {

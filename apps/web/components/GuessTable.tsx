@@ -2,7 +2,7 @@ import { GuessModel } from "../lib/guess/guess.model";
 import { format } from 'date-fns';
 
 export function GuessTable({ guesses }: { guesses: GuessModel[] }) {
-    function formatWalletAddress(wallet: string): string {
+    const formatWalletAddress = (wallet: string): string => {
         if (wallet.length > 10) {
             return `${wallet.slice(0, 6)}...${wallet.slice(-4)}`;
         }
@@ -10,12 +10,12 @@ export function GuessTable({ guesses }: { guesses: GuessModel[] }) {
     };
 
     // Format date for display
-    function formatDate(date: Date): string {
+    const formatDate = (date: Date): string => {
         return format(new Date(date), 'MMM d, yyyy h:mm a');
     };
 
     return (
-        <div className="flex w-full">
+        <div className="flex w-full max-h-96 overflow-y-auto">
             <table>
                 <thead className="bg-gray-50">
                     <tr>
@@ -50,8 +50,8 @@ export function GuessTable({ guesses }: { guesses: GuessModel[] }) {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${guess.isCorrect
-                                        ? 'bg-green-100 text-green-800'
-                                        : 'bg-red-100 text-red-800'
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-red-100 text-red-800'
                                     }`}>
                                     {guess.isCorrect ? 'Correct' : 'Incorrect'}
                                 </span>

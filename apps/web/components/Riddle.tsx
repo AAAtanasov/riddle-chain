@@ -20,6 +20,7 @@ export default async function Riddle() {
 
     async function storeGuess(guess: GuessModel): Promise<void> {
         'use server';
+        console.log("Storing guess:", guess);
         await addGuess(guess);
     }
 
